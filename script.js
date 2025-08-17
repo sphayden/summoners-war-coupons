@@ -269,12 +269,14 @@ function renderCouponTable() {
             <td>${formatRewards(coupon.rewards)}</td>
             <td>
                 <div class="vote-buttons">
-                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] === 'up' ? 'voted' : ''}" 
-                            onclick="vote('${coupon.id}', 'up')">
+                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] ? 'voted' : ''}" 
+                            onclick="vote('${coupon.id}', 'up')"
+                            ${userSession.votedCoupons[coupon.id] ? 'disabled' : ''}>
                         👍 ${coupon.votes.up}
                     </button>
-                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] === 'down' ? 'voted' : ''}" 
-                            onclick="vote('${coupon.id}', 'down')">
+                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] ? 'voted' : ''}" 
+                            onclick="vote('${coupon.id}', 'down')"
+                            ${userSession.votedCoupons[coupon.id] ? 'disabled' : ''}>
                         👎 ${coupon.votes.down}
                     </button>
                 </div>
@@ -305,7 +307,7 @@ function formatRewards(rewards) {
 async function vote(couponId, voteType) {
     const previousVote = userSession.votedCoupons[couponId];
     
-    if (previousVote === voteType) {
+    if (previousVote) {
         showMessage('You have already voted on this coupon!', 'warning');
         return;
     }
@@ -332,7 +334,7 @@ async function vote(couponId, voteType) {
                 coupons[couponIndex] = data.coupon;
             }
             
-            // Update user session
+            // Update user session - mark as voted (don't store which type)
             userSession.votedCoupons[couponId] = voteType;
             localStorage.setItem('votedCoupons', JSON.stringify(userSession.votedCoupons));
             
@@ -413,13 +415,12 @@ async function handleCouponSubmission(event) {
             closeModalHandler();
             showMessage('Coupon added successfully!', 'success');
         } else if (response.status === 409) {
-            // Coupon already exists, vote on it
-            const existingCoupon = data.existingCoupon;
-            if (existingCoupon) {
-                await vote(existingCoupon.id, 'up');
-                showMessage('Coupon already exists! Your submission counted as an upvote.', 'warning');
-                closeModalHandler();
-            }
+            // Coupon already exists
+            showMessage(data.error || 'This coupon code has already been submitted.', 'warning');
+            closeModalHandler();
+        } else if (response.status === 400) {
+            // Invalid coupon code
+            showMessage(data.error || 'Invalid coupon code.', 'error');
         } else {
             console.error('API Error:', data);
             throw new Error(data.error || 'Failed to add coupon');

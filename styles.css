@@ -232,6 +232,11 @@ header p {
     border-color: var(--primary-color);
 }
 
+.vote-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 
 .modal {
     display: none;
