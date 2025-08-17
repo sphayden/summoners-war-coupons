@@ -54,17 +54,17 @@ const S3_BASE_URL = "https://sph-sw-bot-image-hosting.s3.us-east-2.amazonaws.com
 
 // Background images from S3
 const BACKGROUND_IMAGES = [
-    `${S3_BASE_URL}/codes_webp/2023_1.webp`,
-    `${S3_BASE_URL}/codes_webp/23_06+New+monsters.webp`,
-    `${S3_BASE_URL}/codes_webp/2nd_Living+Armor.webp`,
-    `${S3_BASE_URL}/codes_webp/9YA_main.webp`,
-    `${S3_BASE_URL}/codes_webp/9YA_sub.webp`,
-    `${S3_BASE_URL}/codes_webp/April_transmog.webp`,
-    `${S3_BASE_URL}/codes_webp/Franken_23.webp`,
-    `${S3_BASE_URL}/codes_webp/WorldArena_transmog.webp`
+    `${S3_BASE_URL}/4k/2024_Dec_New monsters.png`,
+    `${S3_BASE_URL}/4k/2024_Nov Transmog.png`,
+    `${S3_BASE_URL}/4k/Oct New monster.png`,
+    `${S3_BASE_URL}/4k/2408_Transmog.png`,
+    `${S3_BASE_URL}/4k/JujutsuKaisen Collab_Teaser.png`,
+    `${S3_BASE_URL}/4k/0225_2025_1월_형상변환57차_홍보이미지.png`
 ];
 
 let currentBackgroundIndex = 0;
+let nextBackgroundIndex = 1;
+let isTransitioning = false;
 let parallaxAnimation;
 
 // Reward types configuration
@@ -139,50 +139,103 @@ const messageContainer = document.getElementById('messageContainer');
 // API base URL
 const API_BASE = '/.netlify/functions';
 
-// Generate random parallax positions
-function getRandomParallaxPosition() {
-    const x = Math.random() * 40 + 30; // 30-70% (wider range)
-    const y = Math.random() * 40 + 30; // 30-70% (wider range)
+// Subtle parallax movement
+function getSubtleParallaxPosition() {
+    const x = Math.random() * 20 + 40; // 40-60% (subtle movement)
+    const y = Math.random() * 20 + 40; // 40-60% (subtle movement)
     return { x, y };
 }
 
-// Start parallax movement for current background
-function startParallaxMovement() {
+// Start subtle parallax movement for current background
+function startSubtleParallax() {
     if (parallaxAnimation) {
         clearInterval(parallaxAnimation);
     }
     
-    // Faster parallax movement every 5 seconds
+    // Slower, smoother parallax movement every 8 seconds
     parallaxAnimation = setInterval(() => {
-        const { x, y } = getRandomParallaxPosition();
+        const { x, y } = getSubtleParallaxPosition();
         document.body.style.setProperty('--bg-x', `${x}%`);
         document.body.style.setProperty('--bg-y', `${y}%`);
-    }, 5000);
-    
-    // Set initial random position
-    const { x, y } = getRandomParallaxPosition();
-    document.body.style.setProperty('--bg-x', `${x}%`);
-    document.body.style.setProperty('--bg-y', `${y}%`);
+    }, 8000);
 }
 
-// Initialize background rotation
+// Stop parallax movement
+function stopParallax() {
+    if (parallaxAnimation) {
+        clearInterval(parallaxAnimation);
+        parallaxAnimation = null;
+    }
+}
+
+// Initialize background rotation with smooth fade transitions
 function initializeBackgroundRotation() {
-    // Set initial background
-    document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[0]}')`);
+    // Set initial backgrounds for dual system
+    document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[currentBackgroundIndex]}')`);
+    document.body.style.setProperty('--bg-image-next', `url('${BACKGROUND_IMAGES[nextBackgroundIndex]}')`);
+    document.body.style.setProperty('--bg-opacity', '0.2');
+    document.body.style.setProperty('--bg-opacity-next', '0');
     
-    // Start parallax movement
-    startParallaxMovement();
+    // Set initial position to center
+    document.body.style.setProperty('--bg-x', '50%');
+    document.body.style.setProperty('--bg-y', '50%');
     
-    // Rotate backgrounds every 15 seconds with direct crossfade
+    // Start continuous parallax movement immediately
+    startSubtleParallax();
+    
+    // Rotate backgrounds every 15 seconds with smooth crossfade
     setInterval(() => {
-        currentBackgroundIndex = (currentBackgroundIndex + 1) % BACKGROUND_IMAGES.length;
+        if (isTransitioning) return; // Prevent overlapping transitions
         
-        // Direct transition to new image (CSS handles the smooth crossfade)
-        document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[currentBackgroundIndex]}')`);
-        
-        // Start new parallax movement for new image
-        startParallaxMovement();
+        transitionToNextBackground();
     }, 15000);
+}
+
+// Clean crossfade transition - new image fades in at center
+function transitionToNextBackground() {
+    isTransitioning = true;
+    
+    // Calculate the NEXT image index (don't change current yet)
+    const nextIndex = (currentBackgroundIndex + 1) % BACKGROUND_IMAGES.length;
+    
+    // Set the next background image at center position
+    document.body.style.setProperty('--bg-image-next', `url('${BACKGROUND_IMAGES[nextIndex]}')`);
+    document.body.style.setProperty('--bg-x-next', '50%');
+    document.body.style.setProperty('--bg-y-next', '50%');
+    
+    // Crossfade: current fades out, next fades in
+    document.body.style.setProperty('--bg-opacity', '0');
+    document.body.style.setProperty('--bg-opacity-next', '0.2');
+    
+    // After transition completes, clean up and start parallax
+    setTimeout(() => {
+        // Update the current index
+        currentBackgroundIndex = nextIndex;
+        nextBackgroundIndex = (nextIndex + 1) % BACKGROUND_IMAGES.length;
+        
+        // Temporarily disable transitions to prevent flicker
+        document.body.style.transition = 'none';
+        
+        // Move the visible next background to current background (at center)
+        document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[currentBackgroundIndex]}')`);
+        document.body.style.setProperty('--bg-x', '50%');
+        document.body.style.setProperty('--bg-y', '50%');
+        document.body.style.setProperty('--bg-opacity', '0.2');
+        
+        // Hide the next background completely
+        document.body.style.setProperty('--bg-opacity-next', '0');
+        
+        // Re-enable transitions after the swap
+        setTimeout(() => {
+            document.body.style.transition = '';
+            isTransitioning = false;
+            
+            // Start parallax movement AFTER transition is fully complete
+            setTimeout(() => {
+                startSubtleParallax();
+            }, 500);
+        }, 50);
+    }, 2000); // Match the CSS transition duration
 }
 
 // Initialize the application
@@ -269,14 +322,12 @@ function renderCouponTable() {
             <td>${formatRewards(coupon.rewards)}</td>
             <td>
                 <div class="vote-buttons">
-                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] ? 'voted' : ''}" 
-                            onclick="vote('${coupon.id}', 'up')"
-                            ${userSession.votedCoupons[coupon.id] ? 'disabled' : ''}>
+                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] === 'up' ? 'voted' : ''}" 
+                            onclick="vote('${coupon.id}', 'up')">
                         👍 ${coupon.votes.up}
                     </button>
-                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] ? 'voted' : ''}" 
-                            onclick="vote('${coupon.id}', 'down')"
-                            ${userSession.votedCoupons[coupon.id] ? 'disabled' : ''}>
+                    <button class="vote-btn ${userSession.votedCoupons[coupon.id] === 'down' ? 'voted' : ''}" 
+                            onclick="vote('${coupon.id}', 'down')">
                         👎 ${coupon.votes.down}
                     </button>
                 </div>
@@ -307,11 +358,6 @@ function formatRewards(rewards) {
 async function vote(couponId, voteType) {
     const previousVote = userSession.votedCoupons[couponId];
     
-    if (previousVote) {
-        showMessage('You have already voted on this coupon!', 'warning');
-        return;
-    }
-    
     try {
         const response = await fetch(`${API_BASE}/vote-coupon`, {
             method: 'PUT',
@@ -321,7 +367,8 @@ async function vote(couponId, voteType) {
             body: JSON.stringify({
                 couponId: couponId,
                 voteType: voteType,
-                userHash: getUserHash()
+                userHash: getUserHash(),
+                previousVote: previousVote
             })
         });
         
@@ -334,13 +381,22 @@ async function vote(couponId, voteType) {
                 coupons[couponIndex] = data.coupon;
             }
             
-            // Update user session - mark as voted (don't store which type)
-            userSession.votedCoupons[couponId] = voteType;
+            // Update user session
+            if (previousVote === voteType) {
+                // Removing vote
+                delete userSession.votedCoupons[couponId];
+                showMessage('Vote removed!', 'success');
+            } else {
+                // Adding or changing vote
+                userSession.votedCoupons[couponId] = voteType;
+                const message = previousVote ? 'Vote changed!' : 'Vote recorded!';
+                showMessage(message, 'success');
+            }
+            
             localStorage.setItem('votedCoupons', JSON.stringify(userSession.votedCoupons));
             
             // Re-render table
             renderCouponTable();
-            showMessage('Vote recorded!', 'success');
         } else {
             throw new Error(data.error || 'Failed to record vote');
         }

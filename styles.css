@@ -29,17 +29,35 @@ body::before {
     position: fixed;
     top: 0;
     left: 0;
-    width: 120vw;
-    height: 120vh;
+    width: 100vw;
+    height: 100vh;
     background-image: var(--bg-image);
     background-size: cover;
     background-position: var(--bg-x, 50%) var(--bg-y, 50%);
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    opacity: 0.4;
+    opacity: var(--bg-opacity, 0.2);
+    z-index: -3;
+    transition: opacity 2s ease-in-out, background-position 6s ease-in-out;
+    transform: translateZ(0);
+    will-change: opacity, background-position;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: var(--bg-image-next);
+    background-size: cover;
+    background-position: var(--bg-x-next, 50%) var(--bg-y-next, 50%);
+    background-repeat: no-repeat;
+    opacity: var(--bg-opacity-next, 0);
     z-index: -2;
-    transition: background-image 4s ease-in-out, background-position 15s ease-in-out;
-    transform: translate(-10%, -10%);
+    transition: opacity 2s ease-in-out, background-position 6s ease-in-out;
+    transform: translateZ(0);
+    will-change: opacity, background-position;
 }
 
 /* Ensure proper sizing on mobile */
@@ -51,8 +69,8 @@ body::before {
     }
 }
 
-body::after {
-    content: '';
+/* Dark overlay for better text readability */
+.dark-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -60,6 +78,7 @@ body::after {
     height: 100%;
     background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(45, 45, 45, 0.6));
     z-index: -1;
+    pointer-events: none;
 }
 
 .container {
@@ -142,7 +161,7 @@ header p {
 }
 
 .coupon-table-container {
-    background: var(--bg-secondary);
+    background: rgba(45, 45, 45, 0.75);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);

@@ -38,7 +38,7 @@ exports.handler = async (event, context) => {
 
   try {
     const body = JSON.parse(event.body);
-    const { couponId, voteType, userHash } = body;
+    const { couponId, voteType, userHash, previousVote } = body;
 
     // Validate input
     if (!couponId || !voteType || !['up', 'down'].includes(voteType)) {
@@ -73,12 +73,41 @@ exports.handler = async (event, context) => {
 
     const coupon = couponResult.Item;
 
-    // Update vote count
-    const updateExpression = `SET votes.${voteType} = votes.${voteType} + :inc, lastUpdated = :now`;
-    const expressionAttributeValues = {
-      ':inc': 1,
-      ':now': new Date().toISOString()
-    };
+    // Handle vote logic
+    let updateExpression, expressionAttributeValues;
+    
+    if (previousVote === voteType) {
+      // User is removing their vote - just decrement
+      updateExpression = `SET votes.${voteType} = votes.${voteType} - :dec, lastUpdated = :now`;
+      expressionAttributeValues = {
+        ':dec': 1,
+        ':now': new Date().toISOString()
+      };
+    } else if (previousVote) {
+      // User is changing their vote - decrement previous and increment new
+      if (previousVote === 'up' && voteType === 'down') {
+        updateExpression = `SET votes.up = votes.up - :dec, votes.down = votes.down + :inc, lastUpdated = :now`;
+        expressionAttributeValues = {
+          ':inc': 1,
+          ':dec': 1,
+          ':now': new Date().toISOString()
+        };
+      } else if (previousVote === 'down' && voteType === 'up') {
+        updateExpression = `SET votes.down = votes.down - :dec, votes.up = votes.up + :inc, lastUpdated = :now`;
+        expressionAttributeValues = {
+          ':inc': 1,
+          ':dec': 1,
+          ':now': new Date().toISOString()
+        };
+      }
+    } else {
+      // New vote - just increment
+      updateExpression = `SET votes.${voteType} = votes.${voteType} + :inc, lastUpdated = :now`;
+      expressionAttributeValues = {
+        ':inc': 1,
+        ':now': new Date().toISOString()
+      };
+    }
 
     const updateParams = {
       TableName: TABLE_NAME,
