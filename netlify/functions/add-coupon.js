@@ -111,12 +111,7 @@ exports.handler = async (event, context) => {
 
     const couponCode = code.trim().toUpperCase();
 
-    // Verify coupon with Summoners War API first
-    console.log(`Verifying coupon: ${couponCode}`);
-    const verification = await validateCouponCode(couponCode);
-    console.log(`Verification result:`, verification);
-
-    // Check if coupon already exists
+    // Check if coupon already exists first
     const checkParams = {
       TableName: TABLE_NAME,
       FilterExpression: 'code = :code',
@@ -133,18 +128,36 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: false,
-          error: 'Coupon already exists',
+          error: 'This coupon code has already been submitted to the community database.',
           existingCoupon: existingCoupons.Items[0]
         })
       };
     }
 
-    // Create new coupon with verification result
+    // Verify coupon with Summoners War API
+    console.log(`Verifying coupon: ${couponCode}`);
+    const verification = await validateCouponCode(couponCode);
+    console.log(`Verification result:`, verification);
+
+    // Reject invalid codes - don't store them
+    if (!verification.isValid) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid coupon code. Please double-check the spelling - this code may be expired, invalid, or region-specific.',
+          verification: verification
+        })
+      };
+    }
+
+    // Create new coupon (only valid codes reach this point)
     const now = new Date().toISOString();
     const newCoupon = {
       id: uuidv4(),
       code: couponCode,
-      status: verification.isValid ? 'valid' : 'expired',
+      status: 'valid',
       addedOn: now,
       lastUpdated: now,
       rewards: rewards,
@@ -164,10 +177,6 @@ exports.handler = async (event, context) => {
 
     await dynamodb.put(putParams).promise();
 
-    const statusMessage = verification.isValid 
-      ? `Coupon added successfully and verified as valid!`
-      : `Coupon added but appears to be invalid or already redeemed. Please double-check the spelling or if it's already been submitted.`;
-
     return {
       statusCode: 201,
       headers,
@@ -175,7 +184,7 @@ exports.handler = async (event, context) => {
         success: true,
         coupon: newCoupon,
         verification: verification,
-        message: statusMessage
+        message: 'Coupon added successfully and verified as valid!'
       })
     };
 
