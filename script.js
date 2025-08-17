@@ -452,7 +452,7 @@ async function handleCouponSubmission(event) {
     try {
         showMessage('Adding coupon...', 'info');
         
-        console.log('API URL:', `${API_BASE}/add-coupon`);
+        // Submitting coupon to API
         const response = await fetch(`${API_BASE}/add-coupon`, {
             method: 'POST',
             headers: {

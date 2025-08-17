@@ -2,16 +2,8 @@ const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
 // Configure AWS
-console.log('AWS Config Debug:', {
-  region: process.env.CUSTOM_AWS_REGION,
-  accessKeyId: process.env.CUSTOM_AWS_ACCESS_KEY_ID,
-  secretKeyLength: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY?.length,
-  secretKeyFirst10: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY?.substring(0, 10),
-  secretKeyLast10: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY?.substring(-10)
-});
-
 AWS.config.update({
-  region: 'us-east-2',
+  region: process.env.CUSTOM_AWS_REGION || 'us-east-2',
   accessKeyId: process.env.CUSTOM_AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY
 });
@@ -49,7 +41,7 @@ async function validateCouponCode(couponCode) {
     });
 
     const responseData = await response.json();
-    console.log('Validation response:', responseData);
+    // Validation response logged for debugging
 
     const isValid = responseData.retMsg === "The coupon gift has been sent.";
     
@@ -109,9 +101,46 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Input validation and sanitization
+    if (typeof code !== 'string' || code.length > 50) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid coupon code format'
+        })
+      };
+    }
+
+    if (!Array.isArray(rewards) || rewards.length > 20) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid rewards format'
+        })
+      };
+    }
+
+    // Validate each reward
+    for (const reward of rewards) {
+      if (!reward.type || !reward.amount || typeof reward.amount !== 'number' || reward.amount <= 0 || reward.amount > 10000) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: 'Invalid reward data'
+          })
+        };
+      }
+    }
+
     const couponCode = code.trim().toUpperCase();
 
-    // Check if coupon already exists first
+    // Check if coupon already exists
     const checkParams = {
       TableName: TABLE_NAME,
       FilterExpression: 'code = :code',
@@ -135,9 +164,7 @@ exports.handler = async (event, context) => {
     }
 
     // Verify coupon with Summoners War API
-    console.log(`Verifying coupon: ${couponCode}`);
     const verification = await validateCouponCode(couponCode);
-    console.log(`Verification result:`, verification);
 
     // Reject invalid codes - don't store them
     if (!verification.isValid) {

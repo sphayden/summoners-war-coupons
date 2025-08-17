@@ -52,6 +52,29 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Additional input validation
+    if (typeof couponId !== 'string' || couponId.length > 100) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid coupon ID format'
+        })
+      };
+    }
+
+    if (userHash && (typeof userHash !== 'string' || userHash.length > 100)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid user hash format'
+        })
+      };
+    }
+
     // Get current coupon
     const getParams = {
       TableName: TABLE_NAME,
