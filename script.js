@@ -437,27 +437,11 @@ function validateSubmission(couponCode) {
         return false;
     }
     
-    // Check daily limit
-    const today = new Date().toDateString();
-    const todaySubmissions = userSession.dailySubmissions[today] || 0;
+    // Daily limit disabled for testing
+    // TODO: Re-enable or replace with hourly limit later
     
-    if (todaySubmissions >= 10) {
-        showMessage('You have reached the daily limit of 10 coupon submissions!', 'error');
-        return false;
-    }
-    
-    // Check rate limiting (24 hours between submissions)
-    if (userSession.lastSubmission) {
-        const lastSubmissionTime = new Date(userSession.lastSubmission);
-        const now = new Date();
-        const hoursSinceLastSubmission = (now - lastSubmissionTime) / (1000 * 60 * 60);
-        
-        if (hoursSinceLastSubmission < 24) {
-            const hoursRemaining = Math.ceil(24 - hoursSinceLastSubmission);
-            showMessage(`Please wait ${hoursRemaining} more hours before submitting another coupon.`, 'error');
-            return false;
-        }
-    }
+    // Rate limiting disabled for testing
+    // TODO: Implement 10 per hour limit later
     
     return true;
 }
