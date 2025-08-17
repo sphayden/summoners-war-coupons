@@ -1,0 +1,377 @@
+:root {
+    --primary-color: #5c7cfa;
+    --bg-dark: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-light: #f8f9fa;
+    --text-muted: #adb5bd;
+    --border-color: #495057;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+}
+
+header p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.language-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lang-btn.active,
+.lang-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.actions {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4c6ef5;
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.coupon-table-container {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.coupon-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.coupon-table th,
+.coupon-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.coupon-table th {
+    background: var(--bg-dark);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.coupon-table tr:hover {
+    background: rgba(92, 124, 250, 0.1);
+}
+
+.coupon-code {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-valid {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-expired {
+    background: var(--danger-color);
+    color: white;
+}
+
+.status-verified {
+    background: var(--warning-color);
+    color: black;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.vote-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vote-btn:hover {
+    color: var(--text-light);
+    border-color: var(--primary-color);
+}
+
+.vote-btn.voted {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    color: var(--primary-color);
+}
+
+.close {
+    color: var(--text-muted);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover {
+    color: var(--text-light);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.help-text {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.reward-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.reward-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-dark);
+}
+
+.reward-item img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+}
+
+.reward-item label {
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.reward-item input {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+}
+
+.message {
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.message.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.message.success {
+    background: var(--success-color);
+}
+
+.message.error {
+    background: var(--danger-color);
+}
+
+.message.warning {
+    background: var(--warning-color);
+    color: black;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .coupon-table {
+        font-size: 14px;
+    }
+    
+    .coupon-table th,
+    .coupon-table td {
+        padding: 10px 8px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .reward-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+}

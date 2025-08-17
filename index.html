@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summoners War Coupon Codes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Summoners War Coupon Codes</h1>
+            <p>Community-driven platform for sharing Summoners War mobile game coupon codes</p>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="fr">Français</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="actions">
+                <button id="addCouponBtn" class="btn btn-primary">Add New Coupon</button>
+            </div>
+
+            <div class="coupon-table-container">
+                <table id="couponTable" class="coupon-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Added On</th>
+                            <th>Reward</th>
+                            <th>Vote</th>
+                        </tr>
+                    </thead>
+                    <tbody id="couponTableBody">
+                        <!-- Dynamic content will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Add Coupon Modal -->
+        <div id="addCouponModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Coupon</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p class="help-text">Thanks for willing to help the community, you are awesome!</p>
+                    <form id="addCouponForm">
+                        <div class="form-group">
+                            <label for="couponCode">Coupon Code *</label>
+                            <input type="text" id="couponCode" name="couponCode" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Rewards</label>
+                            <div class="reward-grid" id="rewardGrid">
+                                <!-- Reward items will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div id="messageContainer" class="message-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
