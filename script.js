@@ -97,12 +97,8 @@ const rewardTypes = {
         name: "Wind Scroll", 
         icon: `${S3_BASE_URL}/scroll_wind.png`
     },
-    light_scroll: { 
-        name: "Light Scroll", 
-        icon: `${S3_BASE_URL}/scroll_light_and_dark.png`
-    },
-    dark_scroll: { 
-        name: "Dark Scroll", 
+    ld_scroll: { 
+        name: "LD Scroll", 
         icon: `${S3_BASE_URL}/scroll_light_and_dark.png`
     },
     summoning_stones: { 
@@ -349,7 +345,18 @@ function formatDate(dateString) {
 // Format rewards for display
 function formatRewards(rewards) {
     return rewards.map(reward => {
-        const config = rewardTypes[reward.type];
+        let config = rewardTypes[reward.type];
+        
+        // Handle legacy light_scroll and dark_scroll entries
+        if (!config && (reward.type === 'light_scroll' || reward.type === 'dark_scroll')) {
+            config = rewardTypes.ld_scroll;
+        }
+        
+        // Fallback for unknown reward types
+        if (!config) {
+            config = { name: reward.type, icon: `${S3_BASE_URL}/crystal.png` };
+        }
+        
         return `<img src="${config.icon}" alt="${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 4px;" />x${reward.amount} ${config.name}`;
     }).join(', ');
 }
