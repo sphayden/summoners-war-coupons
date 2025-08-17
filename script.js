@@ -260,7 +260,7 @@ function renderCouponTable() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <span class="coupon-code">${coupon.code}</span>
+                <a href="http://withhive.me/313/${coupon.code}" target="_blank" class="coupon-code">${coupon.code}</a>
             </td>
             <td>
                 <span class="status-badge status-${coupon.status}">${coupon.status}</span>
@@ -491,6 +491,7 @@ function hideMessage() {
         }
     });
 }
+
 
 
 // Show message to user
