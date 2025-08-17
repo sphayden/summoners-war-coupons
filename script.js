@@ -1,19 +1,122 @@
 // Global coupons array - will be loaded from API
-let coupons = [];
+let coupons = [
+    {
+        id: "sample1",
+        code: "SWQFREE2024",
+        addedOn: "2024-01-15T10:00:00Z",
+        rewards: [
+            { type: "energy", amount: 50 },
+            { type: "crystals", amount: 100 }
+        ],
+        status: "valid",
+        votes: { up: 15, down: 2 }
+    },
+    {
+        id: "sample2", 
+        code: "NEWPLAYER123",
+        addedOn: "2024-01-10T08:30:00Z",
+        rewards: [
+            { type: "mystical_scroll", amount: 1 },
+            { type: "energy", amount: 30 },
+            { type: "swc_emblems", amount: 5 }
+        ],
+        status: "verified",
+        votes: { up: 8, down: 1 }
+    },
+    {
+        id: "sample3",
+        code: "EXPIRED2023", 
+        addedOn: "2023-12-01T12:00:00Z",
+        rewards: [
+            { type: "crystals", amount: 200 },
+            { type: "runes", amount: 3 }
+        ],
+        status: "expired",
+        votes: { up: 5, down: 12 }
+    },
+    {
+        id: "sample4",
+        code: "SCROLLPACK2024",
+        addedOn: "2024-01-12T14:15:00Z", 
+        rewards: [
+            { type: "fire_scroll", amount: 1 },
+            { type: "water_scroll", amount: 1 },
+            { type: "wind_scroll", amount: 1 },
+            { type: "light_scroll", amount: 1 }
+        ],
+        status: "valid",
+        votes: { up: 23, down: 0 }
+    }
+];
+
+// S3 base URL for images
+const S3_BASE_URL = "https://sph-sw-bot-image-hosting.s3.us-east-2.amazonaws.com";
+
+// Background images from S3
+const BACKGROUND_IMAGES = [
+    `${S3_BASE_URL}/codes_webp/2023_1.webp`,
+    `${S3_BASE_URL}/codes_webp/23_06+New+monsters.webp`,
+    `${S3_BASE_URL}/codes_webp/2nd_Living+Armor.webp`,
+    `${S3_BASE_URL}/codes_webp/9YA_main.webp`,
+    `${S3_BASE_URL}/codes_webp/9YA_sub.webp`,
+    `${S3_BASE_URL}/codes_webp/April_transmog.webp`,
+    `${S3_BASE_URL}/codes_webp/Franken_23.webp`,
+    `${S3_BASE_URL}/codes_webp/WorldArena_transmog.webp`
+];
+
+let currentBackgroundIndex = 0;
+let parallaxAnimation;
 
 // Reward types configuration
 const rewardTypes = {
-    energy: { name: "Energy", icon: "⚡" },
-    crystals: { name: "Crystals", icon: "💎" },
-    mana: { name: "Mana", icon: "🔮" },
-    mystical_scroll: { name: "Mystical Scroll", icon: "📜" },
-    fire_scroll: { name: "Fire Scroll", icon: "🔥" },
-    water_scroll: { name: "Water Scroll", icon: "💧" },
-    wind_scroll: { name: "Wind Scroll", icon: "💨" },
-    light_scroll: { name: "Light Scroll", icon: "☀️" },
-    dark_scroll: { name: "Dark Scroll", icon: "🌙" },
-    summoning_stones: { name: "Summoning Stones", icon: "🗿" },
-    runes: { name: "Runes", icon: "⚗️" }
+    energy: { 
+        name: "Energy", 
+        icon: `${S3_BASE_URL}/energy.png`
+    },
+    crystals: { 
+        name: "Crystals", 
+        icon: `${S3_BASE_URL}/crystal.png`
+    },
+    mana: { 
+        name: "Mana", 
+        icon: `${S3_BASE_URL}/mana.png`
+    },
+    mystical_scroll: { 
+        name: "Mystical Scroll", 
+        icon: `${S3_BASE_URL}/scroll_mystical.png`
+    },
+    fire_scroll: { 
+        name: "Fire Scroll", 
+        icon: `${S3_BASE_URL}/scroll_fire.png`
+    },
+    water_scroll: { 
+        name: "Water Scroll", 
+        icon: `${S3_BASE_URL}/scroll_water.png`
+    },
+    wind_scroll: { 
+        name: "Wind Scroll", 
+        icon: `${S3_BASE_URL}/scroll_wind.png`
+    },
+    light_scroll: { 
+        name: "Light Scroll", 
+        icon: `${S3_BASE_URL}/scroll_light_and_dark.png`
+    },
+    dark_scroll: { 
+        name: "Dark Scroll", 
+        icon: `${S3_BASE_URL}/scroll_light_and_dark.png`
+    },
+    summoning_stones: { 
+        name: "Summoning Stones", 
+        icon: `${S3_BASE_URL}/summon_exclusive.png`
+    },
+    runes: { 
+        name: "Runes", 
+        icon: `${S3_BASE_URL}/rune.png`
+    },
+    swc_emblems: { 
+        name: "SWC Emblems", 
+        icon: `${S3_BASE_URL}/swc2.png`
+    }
 };
 
 // User session data (stored in localStorage)
@@ -36,11 +139,58 @@ const messageContainer = document.getElementById('messageContainer');
 // API base URL
 const API_BASE = '/.netlify/functions';
 
+// Generate random parallax positions
+function getRandomParallaxPosition() {
+    const x = Math.random() * 40 + 30; // 30-70% (wider range)
+    const y = Math.random() * 40 + 30; // 30-70% (wider range)
+    return { x, y };
+}
+
+// Start parallax movement for current background
+function startParallaxMovement() {
+    if (parallaxAnimation) {
+        clearInterval(parallaxAnimation);
+    }
+    
+    // Faster parallax movement every 5 seconds
+    parallaxAnimation = setInterval(() => {
+        const { x, y } = getRandomParallaxPosition();
+        document.body.style.setProperty('--bg-x', `${x}%`);
+        document.body.style.setProperty('--bg-y', `${y}%`);
+    }, 5000);
+    
+    // Set initial random position
+    const { x, y } = getRandomParallaxPosition();
+    document.body.style.setProperty('--bg-x', `${x}%`);
+    document.body.style.setProperty('--bg-y', `${y}%`);
+}
+
+// Initialize background rotation
+function initializeBackgroundRotation() {
+    // Set initial background
+    document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[0]}')`);
+    
+    // Start parallax movement
+    startParallaxMovement();
+    
+    // Rotate backgrounds every 15 seconds with direct crossfade
+    setInterval(() => {
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % BACKGROUND_IMAGES.length;
+        
+        // Direct transition to new image (CSS handles the smooth crossfade)
+        document.body.style.setProperty('--bg-image', `url('${BACKGROUND_IMAGES[currentBackgroundIndex]}')`);
+        
+        // Start new parallax movement for new image
+        startParallaxMovement();
+    }, 15000);
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeRewardGrid();
-    loadCoupons();
+    renderCouponTable(); // Use sample data locally, loadCoupons() for production
     setupEventListeners();
+    initializeBackgroundRotation();
 });
 
 // Setup event listeners
@@ -66,7 +216,7 @@ function initializeRewardGrid() {
         const rewardItem = document.createElement('div');
         rewardItem.className = 'reward-item';
         rewardItem.innerHTML = `
-            <div style="font-size: 24px;">${config.icon}</div>
+            <img src="${config.icon}" alt="${config.name}" style="width: 40px; height: 40px; object-fit: contain;" />
             <label>${config.name}</label>
             <input type="number" name="reward_${type}" min="0" value="0" />
         `;
@@ -145,7 +295,7 @@ function formatDate(dateString) {
 function formatRewards(rewards) {
     return rewards.map(reward => {
         const config = rewardTypes[reward.type];
-        return `${config.icon} ${reward.amount} ${config.name}`;
+        return `<img src="${config.icon}" alt="${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 4px;" />x${reward.amount} ${config.name}`;
     }).join(', ');
 }
 
