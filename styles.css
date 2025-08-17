@@ -225,6 +225,7 @@ header p {
     border-color: var(--primary-color);
 }
 
+
 .modal {
     display: none;
     position: fixed;

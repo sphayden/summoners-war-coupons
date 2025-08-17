@@ -188,7 +188,7 @@ function initializeBackgroundRotation() {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     initializeRewardGrid();
-    renderCouponTable(); // Use sample data locally, loadCoupons() for production
+    loadCoupons(); // Use loadCoupons() for production
     setupEventListeners();
     initializeBackgroundRotation();
 });
@@ -251,7 +251,7 @@ function renderCouponTable() {
     
     if (coupons.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="4" style="text-align: center; padding: 40px;">No coupons available yet. Be the first to add one!</td>';
+        row.innerHTML = '<td colspan="5" style="text-align: center; padding: 40px;">No coupons available yet. Be the first to add one!</td>';
         couponTableBody.appendChild(row);
         return;
     }
@@ -261,6 +261,8 @@ function renderCouponTable() {
         row.innerHTML = `
             <td>
                 <span class="coupon-code">${coupon.code}</span>
+            </td>
+            <td>
                 <span class="status-badge status-${coupon.status}">${coupon.status}</span>
             </td>
             <td>${formatDate(coupon.addedOn)}</td>
@@ -385,6 +387,7 @@ async function handleCouponSubmission(event) {
     try {
         showMessage('Adding coupon...', 'info');
         
+        console.log('API URL:', `${API_BASE}/add-coupon`);
         const response = await fetch(`${API_BASE}/add-coupon`, {
             method: 'POST',
             headers: {
@@ -418,6 +421,7 @@ async function handleCouponSubmission(event) {
                 closeModalHandler();
             }
         } else {
+            console.error('API Error:', data);
             throw new Error(data.error || 'Failed to add coupon');
         }
     } catch (error) {
@@ -487,6 +491,7 @@ function hideMessage() {
         }
     });
 }
+
 
 // Show message to user
 function showMessage(text, type = 'info') {

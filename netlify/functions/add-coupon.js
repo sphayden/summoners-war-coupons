@@ -2,8 +2,14 @@ const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
 // Configure AWS
+console.log('AWS Config:', {
+  region: process.env.CUSTOM_AWS_REGION,
+  accessKeyId: process.env.CUSTOM_AWS_ACCESS_KEY_ID ? 'SET' : 'MISSING',
+  secretAccessKey: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY ? 'SET' : 'MISSING'
+});
+
 AWS.config.update({
-  region: process.env.CUSTOM_AWS_REGION || 'us-east-1',
+  region: process.env.CUSTOM_AWS_REGION || 'us-east-2',
   accessKeyId: process.env.CUSTOM_AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.CUSTOM_AWS_SECRET_ACCESS_KEY
 });
