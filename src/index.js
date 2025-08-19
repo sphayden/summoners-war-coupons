@@ -351,10 +351,83 @@ const handleVoteCoupon = async (request, env) => {
   }
 };
 
-// Import static files as text
-import indexHtml from '../index.html';
-import stylesCss from '../styles.css';
-import scriptJs from '../script.js';
+// Static files embedded directly
+const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summoners War Coupon Codes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Summoners War Coupon Codes</h1>
+            <p>Community-driven platform for sharing Summoners War mobile game coupon codes</p>
+        </header>
+
+        <main>
+            <div class="actions">
+                <button id="addCouponBtn" class="btn btn-primary">Add New Coupon</button>
+            </div>
+
+            <div class="coupon-table-container">
+                <table id="couponTable" class="coupon-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Status</th>
+                            <th>Added On</th>
+                            <th>Reward</th>
+                            <th>Vote</th>
+                        </tr>
+                    </thead>
+                    <tbody id="couponTableBody">
+                        <!-- Dynamic content will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Add Coupon Modal -->
+        <div id="addCouponModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Coupon</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p class="help-text">Thanks for willing to help the community, you are awesome!</p>
+                    <form id="addCouponForm">
+                        <div class="form-group">
+                            <label for="couponCode">Coupon Code *</label>
+                            <input type="text" id="couponCode" name="couponCode" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Rewards</label>
+                            <div class="reward-grid" id="rewardGrid">
+                                <!-- Reward items will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div id="messageContainer" class="message-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>`;
 
 export default {
   async fetch(request, env, ctx) {
@@ -376,15 +449,948 @@ export default {
         headers: { 'Content-Type': 'text/html' }
       });
     } else if (path === '/styles.css') {
-      return new Response(stylesCss, {
-        headers: { 'Content-Type': 'text/css' }
-      });
+      return serveCSS();
     } else if (path === '/script.js') {
-      return new Response(scriptJs, {
-        headers: { 'Content-Type': 'application/javascript' }
-      });
+      return serveJS();
     }
     
     return new Response('Not found', { status: 404 });
   },
 };
+
+function serveCSS() {
+  const css = \`:root {
+    --primary-color: #5c7cfa;
+    --bg-dark: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-light: #f8f9fa;
+    --text-muted: #adb5bd;
+    --border-color: #495057;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: var(--bg-x, 50%) var(--bg-y, 50%);
+    background-repeat: no-repeat;
+    opacity: var(--bg-opacity, 0.2);
+    z-index: -3;
+    transition: opacity 2s ease-in-out, background-position 6s ease-in-out;
+    transform: translateZ(0);
+    will-change: opacity, background-position;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: var(--bg-image-next);
+    background-size: cover;
+    background-position: var(--bg-x-next, 50%) var(--bg-y-next, 50%);
+    background-repeat: no-repeat;
+    opacity: var(--bg-opacity-next, 0);
+    z-index: -2;
+    transition: opacity 2s ease-in-out, background-position 6s ease-in-out;
+    transform: translateZ(0);
+    will-change: opacity, background-position;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+}
+
+header p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.actions {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4c6ef5;
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.coupon-table-container {
+    background: rgba(45, 45, 45, 0.75);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.coupon-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.coupon-table th,
+.coupon-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.coupon-table th {
+    background: var(--bg-dark);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.coupon-table tr:hover {
+    background: rgba(92, 124, 250, 0.1);
+}
+
+.coupon-code {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.coupon-code:hover {
+    color: var(--text-light);
+    text-decoration: underline;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-valid {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-expired {
+    background: var(--danger-color);
+    color: white;
+}
+
+.status-verified {
+    background: var(--warning-color);
+    color: black;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.vote-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vote-btn:hover {
+    color: var(--text-light);
+    border-color: var(--primary-color);
+}
+
+.vote-btn.voted {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.vote-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    color: var(--primary-color);
+}
+
+.close {
+    color: var(--text-muted);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover {
+    color: var(--text-light);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.help-text {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.reward-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.reward-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-dark);
+}
+
+.reward-item img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    object-fit: contain;
+}
+
+.reward-item label {
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.reward-item input {
+    width: 60px;
+    text-align: center;
+    padding: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+}
+
+.message {
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+}
+
+.message.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.message.success {
+    background: var(--success-color);
+}
+
+.message.error {
+    background: var(--danger-color);
+}
+
+.message.warning {
+    background: var(--warning-color);
+    color: black;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .coupon-table {
+        font-size: 14px;
+    }
+    
+    .coupon-table th,
+    .coupon-table td {
+        padding: 10px 8px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .reward-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+}\`;
+  
+  return new Response(css, {
+    headers: { 'Content-Type': 'text/css' }
+  });
+}
+
+function serveJS() {
+  const js = \`// Global coupons array - will be loaded from API
+let coupons = [];
+
+// S3 base URL for images
+const S3_BASE_URL = "https://sph-sw-bot-image-hosting.s3.us-east-2.amazonaws.com";
+
+// Background images from S3
+const BACKGROUND_IMAGES = [
+    \\\`\\\${S3_BASE_URL}/4k/2024_Dec_New monsters.png\\\`,
+    \\\`\\\${S3_BASE_URL}/4k/2024_Nov Transmog.png\\\`,
+    \\\`\\\${S3_BASE_URL}/4k/Oct New monster.png\\\`,
+    \\\`\\\${S3_BASE_URL}/4k/2408_Transmog.png\\\`,
+    \\\`\\\${S3_BASE_URL}/4k/JujutsuKaisen Collab_Teaser.png\\\`,
+    \\\`\\\${S3_BASE_URL}/4k/0225_2025_1월_형상변환57차_홍보이미지.png\\\`
+];
+
+let currentBackgroundIndex = 0;
+let nextBackgroundIndex = 1;
+let isTransitioning = false;
+let parallaxAnimation;
+
+// Reward types configuration
+const rewardTypes = {
+    energy: { 
+        name: "Energy", 
+        icon: \\\`\\\${S3_BASE_URL}/energy.png\\\`
+    },
+    crystals: { 
+        name: "Crystals", 
+        icon: \\\`\\\${S3_BASE_URL}/crystal.png\\\`
+    },
+    mana: { 
+        name: "Mana", 
+        icon: \\\`\\\${S3_BASE_URL}/mana.png\\\`
+    },
+    mystical_scroll: { 
+        name: "Mystical Scroll", 
+        icon: \\\`\\\${S3_BASE_URL}/scroll_mystical.png\\\`
+    },
+    fire_scroll: { 
+        name: "Fire Scroll", 
+        icon: \\\`\\\${S3_BASE_URL}/scroll_fire.png\\\`
+    },
+    water_scroll: { 
+        name: "Water Scroll", 
+        icon: \\\`\\\${S3_BASE_URL}/scroll_water.png\\\`
+    },
+    wind_scroll: { 
+        name: "Wind Scroll", 
+        icon: \\\`\\\${S3_BASE_URL}/scroll_wind.png\\\`
+    },
+    ld_scroll: { 
+        name: "LD Scroll", 
+        icon: \\\`\\\${S3_BASE_URL}/scroll_light_and_dark.png\\\`
+    },
+    summoning_stones: { 
+        name: "Summoning Stones", 
+        icon: \\\`\\\${S3_BASE_URL}/summon_exclusive.png\\\`
+    },
+    runes: { 
+        name: "Runes", 
+        icon: \\\`\\\${S3_BASE_URL}/rune.png\\\`
+    },
+    swc_emblems: { 
+        name: "SWC Emblems", 
+        icon: \\\`\\\${S3_BASE_URL}/swc2.png\\\`
+    }
+};
+
+// User session data (stored in localStorage)
+let userSession = {
+    votedCoupons: JSON.parse(localStorage.getItem('votedCoupons') || '{}'),
+    dailySubmissions: JSON.parse(localStorage.getItem('dailySubmissions') || '{}'),
+    lastSubmission: localStorage.getItem('lastSubmission') || null
+};
+
+// DOM elements
+const addCouponBtn = document.getElementById('addCouponBtn');
+const addCouponModal = document.getElementById('addCouponModal');
+const closeModal = document.querySelector('.close');
+const cancelBtn = document.getElementById('cancelBtn');
+const addCouponForm = document.getElementById('addCouponForm');
+const couponTableBody = document.getElementById('couponTableBody');
+const rewardGrid = document.getElementById('rewardGrid');
+const messageContainer = document.getElementById('messageContainer');
+
+// API base URL - Worker endpoints
+const API_BASE = '';
+
+// Subtle parallax movement
+function getSubtleParallaxPosition() {
+    const x = Math.random() * 20 + 40; // 40-60% (subtle movement)
+    const y = Math.random() * 20 + 40; // 40-60% (subtle movement)
+    return { x, y };
+}
+
+// Start subtle parallax movement for current background
+function startSubtleParallax() {
+    if (parallaxAnimation) {
+        clearInterval(parallaxAnimation);
+    }
+    
+    // Slower, smoother parallax movement every 8 seconds
+    parallaxAnimation = setInterval(() => {
+        const { x, y } = getSubtleParallaxPosition();
+        document.body.style.setProperty('--bg-x', \\\`\\\${x}%\\\`);
+        document.body.style.setProperty('--bg-y', \\\`\\\${y}%\\\`);
+    }, 8000);
+}
+
+// Stop parallax movement
+function stopParallax() {
+    if (parallaxAnimation) {
+        clearInterval(parallaxAnimation);
+        parallaxAnimation = null;
+    }
+}
+
+// Initialize background rotation with smooth fade transitions
+function initializeBackgroundRotation() {
+    // Set initial backgrounds for dual system
+    document.body.style.setProperty('--bg-image', \\\`url('\\\${BACKGROUND_IMAGES[currentBackgroundIndex]}')\\\`);
+    document.body.style.setProperty('--bg-image-next', \\\`url('\\\${BACKGROUND_IMAGES[nextBackgroundIndex]}')\\\`);
+    document.body.style.setProperty('--bg-opacity', '0.2');
+    document.body.style.setProperty('--bg-opacity-next', '0');
+    
+    // Set initial position to center
+    document.body.style.setProperty('--bg-x', '50%');
+    document.body.style.setProperty('--bg-y', '50%');
+    
+    // Start continuous parallax movement immediately
+    startSubtleParallax();
+    
+    // Rotate backgrounds every 15 seconds with smooth crossfade
+    setInterval(() => {
+        if (isTransitioning) return; // Prevent overlapping transitions
+        
+        transitionToNextBackground();
+    }, 15000);
+}
+
+// Clean crossfade transition - new image fades in at center
+function transitionToNextBackground() {
+    isTransitioning = true;
+    
+    // Calculate the NEXT image index (don't change current yet)
+    const nextIndex = (currentBackgroundIndex + 1) % BACKGROUND_IMAGES.length;
+    
+    // Set the next background image at center position
+    document.body.style.setProperty('--bg-image-next', \\\`url('\\\${BACKGROUND_IMAGES[nextIndex]}')\\\`);
+    document.body.style.setProperty('--bg-x-next', '50%');
+    document.body.style.setProperty('--bg-y-next', '50%');
+    
+    // Crossfade: current fades out, next fades in
+    document.body.style.setProperty('--bg-opacity', '0');
+    document.body.style.setProperty('--bg-opacity-next', '0.2');
+    
+    // After transition completes, clean up and start parallax
+    setTimeout(() => {
+        // Update the current index
+        currentBackgroundIndex = nextIndex;
+        nextBackgroundIndex = (nextIndex + 1) % BACKGROUND_IMAGES.length;
+        
+        // Temporarily disable transitions to prevent flicker
+        document.body.style.transition = 'none';
+        
+        // Move the visible next background to current background (at center)
+        document.body.style.setProperty('--bg-image', \\\`url('\\\${BACKGROUND_IMAGES[currentBackgroundIndex]}')\\\`);
+        document.body.style.setProperty('--bg-x', '50%');
+        document.body.style.setProperty('--bg-y', '50%');
+        document.body.style.setProperty('--bg-opacity', '0.2');
+        
+        // Hide the next background completely
+        document.body.style.setProperty('--bg-opacity-next', '0');
+        
+        // Re-enable transitions after the swap
+        setTimeout(() => {
+            document.body.style.transition = '';
+            isTransitioning = false;
+            
+            // Start parallax movement AFTER transition is fully complete
+            setTimeout(() => {
+                startSubtleParallax();
+            }, 500);
+        }, 50);
+    }, 2000); // Match the CSS transition duration
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeRewardGrid();
+    loadCoupons();
+    setupEventListeners();
+    initializeBackgroundRotation();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    addCouponBtn.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalHandler);
+    cancelBtn.addEventListener('click', closeModalHandler);
+    addCouponForm.addEventListener('submit', handleCouponSubmission);
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === addCouponModal) {
+            closeModalHandler();
+        }
+    });
+}
+
+// Initialize reward grid in the modal
+function initializeRewardGrid() {
+    rewardGrid.innerHTML = '';
+    
+    Object.entries(rewardTypes).forEach(([type, config]) => {
+        const rewardItem = document.createElement('div');
+        rewardItem.className = 'reward-item';
+        rewardItem.innerHTML = \\\`
+            <img src="\\\${config.icon}" alt="\\\${config.name}" style="width: 40px; height: 40px; object-fit: contain;" />
+            <label>\\\${config.name}</label>
+            <input type="number" name="reward_\\\${type}" min="0" value="0" />
+        \\\`;
+        rewardGrid.appendChild(rewardItem);
+    });
+}
+
+// Load coupons from API
+async function loadCoupons() {
+    try {
+        showMessage('Loading coupons...', 'info');
+        
+        const response = await fetch(\\\`\\\${API_BASE}/get-coupons\\\`);
+        const data = await response.json();
+        
+        if (data.success) {
+            coupons = data.coupons;
+            renderCouponTable();
+            hideMessage();
+        } else {
+            throw new Error(data.error || 'Failed to load coupons');
+        }
+    } catch (error) {
+        console.error('Error loading coupons:', error);
+        showMessage('Failed to load coupons. Please refresh the page.', 'error');
+    }
+}
+
+// Render the coupon table
+function renderCouponTable() {
+    couponTableBody.innerHTML = '';
+    
+    if (coupons.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="5" style="text-align: center; padding: 40px;">No coupons available yet. Be the first to add one!</td>';
+        couponTableBody.appendChild(row);
+        return;
+    }
+    
+    coupons.forEach(coupon => {
+        const row = document.createElement('tr');
+        row.innerHTML = \\\`
+            <td>
+                <a href="http://withhive.me/313/\\\${coupon.code}" target="_blank" class="coupon-code">\\\${coupon.code}</a>
+            </td>
+            <td>
+                <span class="status-badge status-\\\${coupon.status}">\\\${coupon.status}</span>
+            </td>
+            <td>\\\${formatDate(coupon.addedOn)}</td>
+            <td>\\\${formatRewards(coupon.rewards)}</td>
+            <td>
+                <div class="vote-buttons">
+                    <button class="vote-btn \\\${userSession.votedCoupons[coupon.id] === 'up' ? 'voted' : ''}" 
+                            onclick="vote('\\\${coupon.id}', 'up')">
+                        👍 \\\${coupon.votes.up}
+                    </button>
+                    <button class="vote-btn \\\${userSession.votedCoupons[coupon.id] === 'down' ? 'voted' : ''}" 
+                            onclick="vote('\\\${coupon.id}', 'down')">
+                        👎 \\\${coupon.votes.down}
+                    </button>
+                </div>
+            </td>
+        \\\`;
+        couponTableBody.appendChild(row);
+    });
+}
+
+// Format date for display
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Format rewards for display
+function formatRewards(rewards) {
+    return rewards.map(reward => {
+        let config = rewardTypes[reward.type];
+        
+        // Handle legacy light_scroll and dark_scroll entries
+        if (!config && (reward.type === 'light_scroll' || reward.type === 'dark_scroll')) {
+            config = rewardTypes.ld_scroll;
+        }
+        
+        // Fallback for unknown reward types
+        if (!config) {
+            config = { name: reward.type, icon: \\\`\\\${S3_BASE_URL}/crystal.png\\\` };
+        }
+        
+        return \\\`<img src="\\\${config.icon}" alt="\\\${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 4px;" />x\\\${reward.amount} \\\${config.name}\\\`;
+    }).join(', ');
+}
+
+// Handle voting
+async function vote(couponId, voteType) {
+    const previousVote = userSession.votedCoupons[couponId];
+    
+    try {
+        const response = await fetch(\\\`\\\${API_BASE}/vote-coupon\\\`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                couponId: couponId,
+                voteType: voteType,
+                userHash: getUserHash(),
+                previousVote: previousVote
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local data
+            const couponIndex = coupons.findIndex(c => c.id === couponId);
+            if (couponIndex !== -1) {
+                coupons[couponIndex] = data.coupon;
+            }
+            
+            // Update user session
+            if (previousVote === voteType) {
+                // Removing vote
+                delete userSession.votedCoupons[couponId];
+                showMessage('Vote removed!', 'success');
+            } else {
+                // Adding or changing vote
+                userSession.votedCoupons[couponId] = voteType;
+                const message = previousVote ? 'Vote changed!' : 'Vote recorded!';
+                showMessage(message, 'success');
+            }
+            
+            localStorage.setItem('votedCoupons', JSON.stringify(userSession.votedCoupons));
+            
+            // Re-render table
+            renderCouponTable();
+        } else {
+            throw new Error(data.error || 'Failed to record vote');
+        }
+    } catch (error) {
+        console.error('Error voting:', error);
+        showMessage('Failed to record vote. Please try again.', 'error');
+    }
+}
+
+// Modal functions
+function openModal() {
+    addCouponModal.style.display = 'block';
+}
+
+function closeModalHandler() {
+    addCouponModal.style.display = 'none';
+    addCouponForm.reset();
+}
+
+// Handle coupon submission
+async function handleCouponSubmission(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(addCouponForm);
+    const couponCode = formData.get('couponCode').trim().toUpperCase();
+    
+    // Validation checks
+    if (!validateSubmission(couponCode)) {
+        return;
+    }
+    
+    // Collect rewards
+    const rewards = [];
+    Object.keys(rewardTypes).forEach(type => {
+        const amount = parseInt(formData.get(\\\`reward_\\\${type}\\\`)) || 0;
+        if (amount > 0) {
+            rewards.push({ type, amount });
+        }
+    });
+    
+    if (rewards.length === 0) {
+        showMessage('Please select at least one reward!', 'error');
+        return;
+    }
+    
+    try {
+        showMessage('Adding coupon...', 'info');
+        
+        // Submitting coupon to API
+        const response = await fetch(\\\`\\\${API_BASE}/add-coupon\\\`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                code: couponCode,
+                rewards: rewards,
+                userHash: getUserHash()
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update user session
+            updateUserSession();
+            
+            // Reload coupons from server
+            await loadCoupons();
+            
+            // Close modal and show success
+            closeModalHandler();
+            showMessage('Coupon added successfully!', 'success');
+        } else if (response.status === 409) {
+            // Coupon already exists
+            showMessage(data.error || 'This coupon code has already been submitted.', 'warning');
+            closeModalHandler();
+        } else if (response.status === 400) {
+            // Invalid coupon code
+            showMessage(data.error || 'Invalid coupon code.', 'error');
+        } else {
+            console.error('API Error:', data);
+            throw new Error(data.error || 'Failed to add coupon');
+        }
+    } catch (error) {
+        console.error('Error adding coupon:', error);
+        showMessage('Failed to add coupon. Please try again.', 'error');
+    }
+}
+
+// Validate submission
+function validateSubmission(couponCode) {
+    if (!couponCode) {
+        showMessage('Please enter a coupon code!', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+// Update user session data
+function updateUserSession() {
+    const today = new Date().toDateString();
+    userSession.dailySubmissions[today] = (userSession.dailySubmissions[today] || 0) + 1;
+    userSession.lastSubmission = new Date().toISOString();
+    
+    localStorage.setItem('dailySubmissions', JSON.stringify(userSession.dailySubmissions));
+    localStorage.setItem('lastSubmission', userSession.lastSubmission);
+}
+
+// Generate or get user hash for anonymous identification
+function getUserHash() {
+    let userHash = localStorage.getItem('userHash');
+    if (!userHash) {
+        userHash = 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userHash', userHash);
+    }
+    return userHash;
+}
+
+// Hide loading message
+function hideMessage() {
+    const messages = messageContainer.querySelectorAll('.message');
+    messages.forEach(message => {
+        if (message.textContent.includes('Loading')) {
+            message.remove();
+        }
+    });
+}
+
+// Show message to user
+function showMessage(text, type = 'info') {
+    // Remove existing loading messages if showing a new one
+    if (type === 'info' && text.includes('Loading')) {
+        hideMessage();
+    }
+    
+    const message = document.createElement('div');
+    message.className = \\\`message \\\${type}\\\`;
+    message.textContent = text;
+    
+    messageContainer.appendChild(message);
+    
+    // Trigger animation
+    setTimeout(() => {
+        message.classList.add('show');
+    }, 100);
+    
+    // Remove after 5 seconds (except loading messages)
+    if (!text.includes('Loading')) {
+        setTimeout(() => {
+            message.classList.remove('show');
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            }, 300);
+        }, 5000);
+    }
+}\`;
+  
+  return new Response(js, {
+    headers: { 'Content-Type': 'application/javascript' }
+  });
+}
