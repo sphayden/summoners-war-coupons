@@ -351,6 +351,11 @@ const handleVoteCoupon = async (request, env) => {
   }
 };
 
+// Import static files as text
+import indexHtml from '../index.html';
+import stylesCss from '../styles.css';
+import scriptJs from '../script.js';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -365,8 +370,21 @@ export default {
       return handleVoteCoupon(request, env);
     }
     
-    // Serve static files - return a basic response for now
-    // You'll need to handle static file serving for your HTML/CSS/JS
-    return new Response('Static file serving not implemented yet', { status: 404 });
+    // Serve static files
+    if (path === '/' || path === '/index.html') {
+      return new Response(indexHtml, {
+        headers: { 'Content-Type': 'text/html' }
+      });
+    } else if (path === '/styles.css') {
+      return new Response(stylesCss, {
+        headers: { 'Content-Type': 'text/css' }
+      });
+    } else if (path === '/script.js') {
+      return new Response(scriptJs, {
+        headers: { 'Content-Type': 'application/javascript' }
+      });
+    }
+    
+    return new Response('Not found', { status: 404 });
   },
 };

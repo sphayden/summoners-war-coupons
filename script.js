@@ -132,8 +132,8 @@ const couponTableBody = document.getElementById('couponTableBody');
 const rewardGrid = document.getElementById('rewardGrid');
 const messageContainer = document.getElementById('messageContainer');
 
-// API base URL
-const API_BASE = '/.netlify/functions';
+// API base URL - Worker endpoints
+const API_BASE = '';
 
 // Subtle parallax movement
 function getSubtleParallaxPosition() {
