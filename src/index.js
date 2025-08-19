@@ -905,10 +905,16 @@ const messageContainer = document.getElementById('messageContainer');
 // API base URL - Worker endpoints
 const API_BASE = '';
 
-// Background and UI functions (simplified for deployment)
+// Background and UI functions
 function initializeBackgroundRotation() {
-    // Simplified background system
-    document.body.style.backgroundColor = '#1a1a1a';
+    document.body.style.setProperty('--bg-image', 'url("' + BACKGROUND_IMAGES[currentBackgroundIndex] + '")');
+    document.body.style.setProperty('--bg-opacity', '0.2');
+    
+    // Rotate backgrounds every 15 seconds
+    setInterval(() => {
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % BACKGROUND_IMAGES.length;
+        document.body.style.setProperty('--bg-image', 'url("' + BACKGROUND_IMAGES[currentBackgroundIndex] + '")');
+    }, 15000);
 }
 
 // Initialize the application
