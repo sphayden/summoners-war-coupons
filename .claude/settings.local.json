@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:swq.jp)"
+      "WebFetch(domain:swq.jp)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

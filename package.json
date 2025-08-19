@@ -9,7 +9,11 @@
   },
   "scripts": {
     "build": "echo 'No build step required'",
-    "dev": "netlify dev"
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

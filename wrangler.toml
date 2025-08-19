@@ -1,0 +1,13 @@
+name = "summoners-war-coupons"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+[env.production.vars]
+DYNAMODB_TABLE_NAME = "summoners-war-coupons"
+CUSTOM_AWS_REGION = "us-east-2"
+
+# Environment variables for AWS credentials and other secrets
+# Set these in Cloudflare Pages dashboard:
+# CUSTOM_AWS_ACCESS_KEY_ID
+# CUSTOM_AWS_SECRET_ACCESS_KEY  
+# HIVE_ID
