@@ -130,6 +130,35 @@ header p {
     margin-bottom: 30px;
 }
 
+.table-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.refresh-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.refresh-icon-btn:hover {
+    color: #4c6ef5;
+    transform: rotate(180deg);
+}
+
+.refresh-icon-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
 .btn {
     padding: 12px 24px;
     border: none;
@@ -165,6 +194,7 @@ header p {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    position: relative;
 }
 
 .coupon-table {

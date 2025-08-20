@@ -126,7 +126,7 @@ exports.handler = async (event, context) => {
 
     // Validate each reward
     for (const reward of rewards) {
-      if (!reward.type || !reward.amount || typeof reward.amount !== 'number' || reward.amount <= 0 || reward.amount > 10000) {
+      if (!reward.type || !reward.amount || typeof reward.amount !== 'number' || reward.amount <= 0 || reward.amount > 1000000) {
         return {
           statusCode: 400,
           headers,
@@ -140,30 +140,8 @@ exports.handler = async (event, context) => {
 
     const couponCode = code.trim().toUpperCase();
 
-    // Check if coupon already exists
-    const checkParams = {
-      TableName: TABLE_NAME,
-      FilterExpression: 'code = :code',
-      ExpressionAttributeValues: {
-        ':code': couponCode
-      }
-    };
-
-    const existingCoupons = await dynamodb.scan(checkParams).promise();
-    
-    if (existingCoupons.Items && existingCoupons.Items.length > 0) {
-      return {
-        statusCode: 409,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: 'This coupon code has already been submitted to the community database.',
-          existingCoupon: existingCoupons.Items[0]
-        })
-      };
-    }
-
-    // Verify coupon with Summoners War API
+    // Verify coupon with Summoners War API FIRST
+    // (Don't waste API calls on duplicates we can catch atomically)
     const verification = await validateCouponCode(couponCode);
 
     // Reject invalid codes - don't store them
@@ -196,13 +174,42 @@ exports.handler = async (event, context) => {
       verificationResult: verification
     };
 
-    // Save to DynamoDB
+    // Save to DynamoDB with atomic duplicate check
     const putParams = {
       TableName: TABLE_NAME,
-      Item: newCoupon
+      Item: newCoupon,
+      ConditionExpression: 'attribute_not_exists(code)' // Prevents race conditions
     };
 
-    await dynamodb.put(putParams).promise();
+    try {
+      await dynamodb.put(putParams).promise();
+    } catch (error) {
+      // Handle race condition - another user added same code
+      if (error.code === 'ConditionalCheckFailedException') {
+        // Fetch the existing coupon to return it
+        const getParams = {
+          TableName: TABLE_NAME,
+          FilterExpression: 'code = :code',
+          ExpressionAttributeValues: {
+            ':code': couponCode
+          }
+        };
+        
+        const existingResult = await dynamodb.scan(getParams).promise();
+        
+        return {
+          statusCode: 409,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: 'This coupon code was just added by another user!',
+            existingCoupon: existingResult.Items?.[0] || null
+          })
+        };
+      }
+      // Re-throw other errors
+      throw error;
+    }
 
     return {
       statusCode: 201,

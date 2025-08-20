@@ -131,9 +131,10 @@ const addCouponForm = document.getElementById('addCouponForm');
 const couponTableBody = document.getElementById('couponTableBody');
 const rewardGrid = document.getElementById('rewardGrid');
 const messageContainer = document.getElementById('messageContainer');
+const refreshBtn = document.getElementById('refreshBtn');
 
-// API base URL - Worker endpoints
-const API_BASE = '';
+// API base URL
+const API_BASE = '/.netlify/functions';
 
 // Subtle parallax movement
 function getSubtleParallaxPosition() {
@@ -249,6 +250,9 @@ function setupEventListeners() {
     cancelBtn.addEventListener('click', closeModalHandler);
     addCouponForm.addEventListener('submit', handleCouponSubmission);
     
+    // Refresh icon handler
+    refreshBtn.addEventListener('click', handleRefreshClick);
+    
     // Close modal when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target === addCouponModal) {
@@ -273,24 +277,74 @@ function initializeRewardGrid() {
     });
 }
 
-// Load coupons from API
+// Cache settings
+const CACHE_DURATION = 30 * 1000; // 30 seconds
+
+// Load coupons from API with caching
 async function loadCoupons() {
     try {
-        showMessage('Loading coupons...', 'info');
+        // 1. Check for cached data and show immediately if available
+        const cached = localStorage.getItem('coupons_cache');
+        const cacheTime = localStorage.getItem('coupons_cache_time');
+        let showedCached = false;
         
+        if (cached && cacheTime) {
+            const age = Date.now() - parseInt(cacheTime);
+            console.log(`Cache found, age: ${age}ms, fresh: ${age < CACHE_DURATION}`);
+            
+            // Show cached data immediately (regardless of age)
+            coupons = JSON.parse(cached);
+            renderCouponTable();
+            showedCached = true;
+            console.log('Displaying cached data');
+            
+            // If cache is fresh, we're done
+            if (age < CACHE_DURATION) {
+                console.log('Cache is fresh, skipping API call');
+                hideMessage();
+                return;
+            }
+        }
+        
+        // 2. Show loading only if we don't have cached data
+        if (!showedCached) {
+            showMessage('Loading coupons...', 'info');
+        }
+        
+        console.log('Fetching fresh data from API');
+        
+        // 3. Always fetch fresh data (but show cached while waiting)
         const response = await fetch(`${API_BASE}/get-coupons`);
         const data = await response.json();
         
         if (data.success) {
-            coupons = data.coupons;
-            renderCouponTable();
+            // 4. Update cache
+            localStorage.setItem('coupons_cache', JSON.stringify(data.coupons));
+            localStorage.setItem('coupons_cache_time', Date.now().toString());
+            
+            // 5. Update display only if data changed
+            const dataChanged = JSON.stringify(coupons) !== JSON.stringify(data.coupons);
+            if (dataChanged || !showedCached) {
+                console.log('Updating display with fresh data');
+                coupons = data.coupons;
+                renderCouponTable();
+                
+            } else {
+                console.log('Data unchanged, keeping current display');
+            }
+            
             hideMessage();
         } else {
             throw new Error(data.error || 'Failed to load coupons');
         }
     } catch (error) {
         console.error('Error loading coupons:', error);
-        showMessage('Failed to load coupons. Please refresh the page.', 'error');
+        // If we showed cached data, don't show error
+        if (!showedCached) {
+            showMessage('Failed to load coupons. Please refresh the page.', 'error');
+        } else {
+            console.log('API failed but showing cached data');
+        }
     }
 }
 
@@ -471,6 +525,11 @@ async function handleCouponSubmission(event) {
             // Update user session
             updateUserSession();
             
+            // Clear cache to force fresh data
+            localStorage.removeItem('coupons_cache');
+            localStorage.removeItem('coupons_cache_time');
+            console.log('Cleared cache after adding coupon');
+            
             // Reload coupons from server
             await loadCoupons();
             
@@ -541,6 +600,18 @@ function hideMessage() {
 }
 
 
+
+// Handle refresh button click
+async function handleRefreshClick() {
+    // Clear cache to force fresh data
+    localStorage.removeItem('coupons_cache');
+    localStorage.removeItem('coupons_cache_time');
+    console.log('Manual refresh: cleared cache');
+    
+    // Reload coupons
+    showMessage('Refreshing coupons...', 'info');
+    await loadCoupons();
+}
 
 // Show message to user
 function showMessage(text, type = 'info') {
