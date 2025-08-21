@@ -386,13 +386,11 @@ function renderCouponTable() {
                 </div>
             </td>
             <td>
-                <button class="web-redeem-btn" onclick="openWebRedeem('${coupon.code}')" title="Redeem on web">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <polyline points="15,3 21,3 21,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <a href="https://event.withhive.com/ci/smon/evt_coupon?code=${coupon.code}" target="_blank" class="web-redeem-btn" onclick="copyToClipboard('${coupon.code}')" title="Redeem on web">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                </button>
+                </a>
             </td>
         `;
         couponTableBody.appendChild(row);
@@ -537,10 +535,10 @@ async function handleCouponSubmission(event) {
             // Update user session
             updateUserSession();
             
-            // Clear cache to force fresh data
+            // Clear only coupon cache to force fresh data
             localStorage.removeItem('coupons_cache');
             localStorage.removeItem('coupons_cache_time');
-            console.log('Cleared cache after adding coupon');
+            console.log('Cleared coupon cache after adding new coupon');
             
             // Reload coupons from server
             await loadCoupons();
@@ -615,17 +613,31 @@ function hideMessage() {
 
 // Handle refresh button click
 async function handleRefreshClick() {
-    // Clear cache to force fresh data
+    // Clear only coupon cache to force fresh data
     localStorage.removeItem('coupons_cache');
     localStorage.removeItem('coupons_cache_time');
-    console.log('Manual refresh: cleared cache');
+    console.log('Manual refresh: cleared coupon cache only');
     
     // Reload coupons
     showMessage('Refreshing coupons...', 'info');
     await loadCoupons();
 }
 
-// Open web redemption page with coupon code
+// Copy coupon code to clipboard when web redeem link is clicked
+async function copyToClipboard(couponCode) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(couponCode);
+        } else {
+            // Fallback for older browsers
+            fallbackCopyTextToClipboard(couponCode);
+        }
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+    }
+}
+
+// Open web redemption page with coupon code (legacy function, kept for compatibility)
 async function openWebRedeem(couponCode) {
     try {
         // Copy to clipboard FIRST (before opening popup)
