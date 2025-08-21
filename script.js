@@ -366,7 +366,10 @@ function renderCouponTable() {
                 <a href="http://withhive.me/313/${coupon.code}" target="_blank" class="coupon-code">${coupon.code}</a>
             </td>
             <td>
-                <span class="status-badge status-${coupon.status}">${coupon.status}</span>
+                <span class="status-badge status-${coupon.status}">
+                    <span class="status-text">${coupon.status}</span>
+                    <span class="status-icon">${coupon.status === 'valid' || coupon.status === 'verified' ? '✓' : '✗'}</span>
+                </span>
             </td>
             <td>${formatDate(coupon.addedOn)}</td>
             <td>${formatRewards(coupon.rewards)}</td>
@@ -381,6 +384,15 @@ function renderCouponTable() {
                         👎 ${coupon.votes.down}
                     </button>
                 </div>
+            </td>
+            <td>
+                <button class="web-redeem-btn" onclick="openWebRedeem('${coupon.code}')" title="Redeem on web">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="15,3 21,3 21,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </td>
         `;
         couponTableBody.appendChild(row);
@@ -411,7 +423,7 @@ function formatRewards(rewards) {
             config = { name: reward.type, icon: `${S3_BASE_URL}/crystal.png` };
         }
         
-        return `<img src="${config.icon}" alt="${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 4px;" />x${reward.amount} ${config.name}`;
+        return `<img src="${config.icon}" alt="${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 2px;" />x${reward.amount}`;
     }).join(', ');
 }
 
@@ -611,6 +623,54 @@ async function handleRefreshClick() {
     // Reload coupons
     showMessage('Refreshing coupons...', 'info');
     await loadCoupons();
+}
+
+// Open web redemption page with coupon code
+async function openWebRedeem(couponCode) {
+    try {
+        // Copy to clipboard FIRST (before opening popup)
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(couponCode);
+        } else {
+            // Fallback for older browsers
+            fallbackCopyTextToClipboard(couponCode);
+        }
+        
+        // Then open the page
+        window.open('https://event.withhive.com/ci/smon/evt_coupon', '_blank');
+        
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        // Still open the page even if copy fails
+        window.open('https://event.withhive.com/ci/smon/evt_coupon', '_blank');
+    }
+}
+
+// Fallback copy function for older browsers
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (!successful) {
+            throw new Error('execCommand failed');
+        }
+    } catch (err) {
+        console.error('Fallback: Could not copy text: ', err);
+        throw err;
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 // Show message to user

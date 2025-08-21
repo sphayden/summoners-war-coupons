@@ -159,6 +159,25 @@ header p {
     height: 22px;
 }
 
+.web-redeem-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 4px 6px;
+    margin-left: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+}
+
+.web-redeem-btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: rgba(92, 124, 250, 0.1);
+}
+
 .btn {
     padding: 12px 24px;
     border: none;
@@ -253,6 +272,39 @@ header p {
 .status-verified {
     background: var(--warning-color);
     color: black;
+}
+
+/* Mobile responsiveness for status */
+.status-text {
+    display: inline;
+}
+
+.status-icon {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .status-text {
+        display: none;
+    }
+    
+    .status-icon {
+        display: inline;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    
+    .status-badge {
+        padding: 6px 8px;
+        min-width: 28px;
+        text-align: center;
+    }
+    
+    /* Hide vote column on mobile */
+    .coupon-table th:nth-child(5),
+    .coupon-table td:nth-child(5) {
+        display: none;
+    }
 }
 
 .vote-buttons {
