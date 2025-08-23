@@ -322,16 +322,10 @@ async function loadCoupons() {
             localStorage.setItem('coupons_cache', JSON.stringify(data.coupons));
             localStorage.setItem('coupons_cache_time', Date.now().toString());
             
-            // 5. Update display only if data changed
-            const dataChanged = JSON.stringify(coupons) !== JSON.stringify(data.coupons);
-            if (dataChanged || !showedCached) {
-                console.log('Updating display with fresh data');
-                coupons = data.coupons;
-                renderCouponTable();
-                
-            } else {
-                console.log('Data unchanged, keeping current display');
-            }
+            // 5. Always update display with fresh data to ensure votes are current
+            console.log('Updating display with fresh data');
+            coupons = data.coupons;
+            renderCouponTable();
             
             hideMessage();
         } else {
