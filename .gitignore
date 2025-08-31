@@ -42,3 +42,12 @@ build/
 # Temporary files
 aws/
 lambda/
+
+# Lambda function dependencies and deployment packages
+functions/__pycache__/
+functions/*.zip
+functions/**/
+functions/*.py
+functions/*.dist-info/
+!functions/expire_coupons.py
+!functions/requirements.txt

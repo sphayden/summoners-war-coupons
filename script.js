@@ -132,6 +132,7 @@ const couponTableBody = document.getElementById('couponTableBody');
 const rewardGrid = document.getElementById('rewardGrid');
 const messageContainer = document.getElementById('messageContainer');
 const refreshBtn = document.getElementById('refreshBtn');
+const showExpiredToggle = document.getElementById('showExpiredToggle');
 
 // API base URL
 const API_BASE = '/.netlify/functions';
@@ -253,6 +254,9 @@ function setupEventListeners() {
     // Refresh icon handler
     refreshBtn.addEventListener('click', handleRefreshClick);
     
+    // Toggle handler for showing/hiding expired codes
+    showExpiredToggle.addEventListener('change', renderCouponTable);
+    
     // Close modal when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target === addCouponModal) {
@@ -353,7 +357,29 @@ function renderCouponTable() {
         return;
     }
     
-    coupons.forEach(coupon => {
+    // Filter coupons based on toggle state
+    let filteredCoupons = [...coupons];
+    if (!showExpiredToggle.checked) {
+        filteredCoupons = coupons.filter(coupon => 
+            coupon.status === 'valid' || coupon.status === 'verified'
+        );
+    }
+    
+    // Sort coupons: valid codes first (sorted by date), then expired codes (sorted by date)
+    const sortedCoupons = filteredCoupons.sort((a, b) => {
+        // First sort by status priority (valid codes first)
+        const statusPriorityA = (a.status === 'valid' || a.status === 'verified') ? 0 : 1;
+        const statusPriorityB = (b.status === 'valid' || b.status === 'verified') ? 0 : 1;
+        
+        if (statusPriorityA !== statusPriorityB) {
+            return statusPriorityA - statusPriorityB;
+        }
+        
+        // Within same status group, sort by addedOn descending (newest first)
+        return new Date(b.addedOn) - new Date(a.addedOn);
+    });
+    
+    sortedCoupons.forEach(coupon => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>

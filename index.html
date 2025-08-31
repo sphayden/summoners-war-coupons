@@ -18,8 +18,15 @@
                 <button id="addCouponBtn" class="btn btn-primary">Add New Coupon</button>
             </div>
 
-            <!-- Refresh icon button above table -->
+            <!-- Refresh icon button and toggle above table -->
             <div class="table-header">
+                <div class="table-controls">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="showExpiredToggle">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Show expired codes</span>
+                    </label>
+                </div>
                 <button id="refreshBtn" class="refresh-icon-btn" title="Refresh coupons">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 12C4 7.58172 7.58172 4 12 4C14.5264 4 16.7792 5.17107 18.2493 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
