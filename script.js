@@ -49,17 +49,16 @@ let coupons = [
     }
 ];
 
-// S3 base URL for images
-const S3_BASE_URL = "https://sph-sw-bot-image-hosting.s3.us-east-2.amazonaws.com";
+// GitHub base URL for images
+const GITHUB_BASE_URL = "https://raw.githubusercontent.com/sphayden/sw-codes/master/assets";
 
-// Background images from S3
+// Background images from GitHub
 const BACKGROUND_IMAGES = [
-    `${S3_BASE_URL}/4k/2024_Dec_New monsters.png`,
-    `${S3_BASE_URL}/4k/2024_Nov Transmog.png`,
-    `${S3_BASE_URL}/4k/Oct New monster.png`,
-    `${S3_BASE_URL}/4k/2408_Transmog.png`,
-    `${S3_BASE_URL}/4k/JujutsuKaisen Collab_Teaser.png`,
-    `${S3_BASE_URL}/4k/0225_2025_1월_형상변환57차_홍보이미지.png`
+    `${GITHUB_BASE_URL}/4k/2024_Dec_New_monsters.png`,
+    `${GITHUB_BASE_URL}/4k/2024_Nov_Transmog.png`,
+    `${GITHUB_BASE_URL}/4k/Oct_New_monster.png`,
+    `${GITHUB_BASE_URL}/4k/2408_Transmog.png`,
+    `${GITHUB_BASE_URL}/4k/JujutsuKaisen_Collab_Teaser.png`
 ];
 
 let currentBackgroundIndex = 0;
@@ -69,49 +68,49 @@ let parallaxAnimation;
 
 // Reward types configuration
 const rewardTypes = {
-    energy: { 
-        name: "Energy", 
-        icon: `${S3_BASE_URL}/energy.png`
+    energy: {
+        name: "Energy",
+        icon: `${GITHUB_BASE_URL}/icons/energy.png`
     },
-    crystals: { 
-        name: "Crystals", 
-        icon: `${S3_BASE_URL}/crystal.png`
+    crystals: {
+        name: "Crystals",
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
-    mana: { 
-        name: "Mana", 
-        icon: `${S3_BASE_URL}/mana.png`
+    mana: {
+        name: "Mana",
+        icon: `${GITHUB_BASE_URL}/icons/mana.png`
     },
     mystical_scroll: { 
         name: "Mystical Scroll", 
-        icon: `${S3_BASE_URL}/scroll_mystical.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     fire_scroll: { 
         name: "Fire Scroll", 
-        icon: `${S3_BASE_URL}/scroll_fire.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     water_scroll: { 
         name: "Water Scroll", 
-        icon: `${S3_BASE_URL}/scroll_water.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     wind_scroll: { 
         name: "Wind Scroll", 
-        icon: `${S3_BASE_URL}/scroll_wind.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     ld_scroll: { 
         name: "LD Scroll", 
-        icon: `${S3_BASE_URL}/scroll_light_and_dark.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     summoning_stones: { 
         name: "Summoning Stones", 
-        icon: `${S3_BASE_URL}/summon_exclusive.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     runes: { 
         name: "Runes", 
-        icon: `${S3_BASE_URL}/rune.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     },
     swc_emblems: { 
         name: "SWC Emblems", 
-        icon: `${S3_BASE_URL}/swc2.png`
+        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
     }
 };
 
@@ -406,11 +405,19 @@ function renderCouponTable() {
                 </div>
             </td>
             <td>
-                <a href="https://event.withhive.com/ci/smon/evt_coupon?code=${coupon.code}" target="_blank" class="web-redeem-btn" onclick="copyToClipboard('${coupon.code}')" title="Redeem on web">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
+                <div class="action-buttons">
+                    <button class="copy-btn" onclick="copyToClipboard('${coupon.code}')" title="Copy code to clipboard">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    <a href="https://event.withhive.com/ci/smon/evt_coupon?code=${coupon.code}" target="_blank" class="web-redeem-btn" title="Redeem on web">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
             </td>
         `;
         couponTableBody.appendChild(row);
@@ -438,7 +445,7 @@ function formatRewards(rewards) {
         
         // Fallback for unknown reward types
         if (!config) {
-            config = { name: reward.type, icon: `${S3_BASE_URL}/crystal.png` };
+            config = { name: reward.type, icon: `${GITHUB_BASE_URL}/icons/crystal.png` };
         }
         
         return `<img src="${config.icon}" alt="${config.name}" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 2px;" />x${reward.amount}`;
@@ -652,8 +659,11 @@ async function copyToClipboard(couponCode) {
             // Fallback for older browsers
             fallbackCopyTextToClipboard(couponCode);
         }
+        // Show success message
+        showMessage(`Copied "${couponCode}" to clipboard!`, 'success');
     } catch (err) {
         console.error('Failed to copy: ', err);
+        showMessage('Failed to copy to clipboard', 'error');
     }
 }
 
