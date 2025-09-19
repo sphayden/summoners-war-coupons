@@ -50,7 +50,7 @@ let coupons = [
 ];
 
 // GitHub base URL for images
-const GITHUB_BASE_URL = "https://raw.githubusercontent.com/sphayden/sw-codes/master/assets";
+const GITHUB_BASE_URL = "https://raw.githubusercontent.com/sphayden/summoners-war-coupons/master/assets";
 
 // Background images from GitHub
 const BACKGROUND_IMAGES = [
