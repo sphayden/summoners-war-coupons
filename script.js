@@ -315,9 +315,15 @@ async function loadCoupons() {
         }
         
         console.log('Fetching fresh data from API');
-        
+
         // 3. Always fetch fresh data (but show cached while waiting)
-        const response = await fetch(`${API_BASE}/get-coupons`);
+        const response = await fetch(`${API_BASE}/get-coupons`, {
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
         const data = await response.json();
         
         if (data.success) {
@@ -460,7 +466,9 @@ async function vote(couponId, voteType) {
         const response = await fetch(`${API_BASE}/vote-coupon`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
             },
             body: JSON.stringify({
                 couponId: couponId,
@@ -547,7 +555,9 @@ async function handleCouponSubmission(event) {
         const response = await fetch(`${API_BASE}/add-coupon`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
             },
             body: JSON.stringify({
                 code: couponCode,

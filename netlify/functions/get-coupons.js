@@ -53,7 +53,9 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers: {
         ...headers,
-        'Cache-Control': 'public, max-age=180, s-maxage=60' // Cache for 3 min client, 1 min CDN
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       },
       body: JSON.stringify({
         success: true,
