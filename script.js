@@ -80,37 +80,37 @@ const rewardTypes = {
         name: "Mana",
         icon: `${GITHUB_BASE_URL}/icons/mana.png`
     },
-    mystical_scroll: { 
-        name: "Mystical Scroll", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    mystical_scroll: {
+        name: "Mystical Scroll",
+        icon: `${GITHUB_BASE_URL}/icons/scroll_mystical.png`
     },
-    fire_scroll: { 
-        name: "Fire Scroll", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    fire_scroll: {
+        name: "Fire Scroll",
+        icon: `${GITHUB_BASE_URL}/icons/scroll_fire.png`
     },
-    water_scroll: { 
-        name: "Water Scroll", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    water_scroll: {
+        name: "Water Scroll",
+        icon: `${GITHUB_BASE_URL}/icons/scroll_water.png`
     },
-    wind_scroll: { 
-        name: "Wind Scroll", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    wind_scroll: {
+        name: "Wind Scroll",
+        icon: `${GITHUB_BASE_URL}/icons/scroll_wind.png`
     },
-    ld_scroll: { 
-        name: "LD Scroll", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    ld_scroll: {
+        name: "LD Scroll",
+        icon: `${GITHUB_BASE_URL}/icons/scroll_light_and_dark.png`
     },
-    summoning_stones: { 
-        name: "Summoning Stones", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    summoning_stones: {
+        name: "Summoning Stones",
+        icon: `${GITHUB_BASE_URL}/icons/summon_exclusive.png`
     },
-    runes: { 
-        name: "Runes", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    runes: {
+        name: "Runes",
+        icon: `${GITHUB_BASE_URL}/icons/rune.png`
     },
-    swc_emblems: { 
-        name: "SWC Emblems", 
-        icon: `${GITHUB_BASE_URL}/icons/crystal.png`
+    swc_emblems: {
+        name: "SWC Emblems",
+        icon: `${GITHUB_BASE_URL}/icons/swc2.png`
     }
 };
 
@@ -148,7 +148,7 @@ function startSubtleParallax() {
     if (parallaxAnimation) {
         clearInterval(parallaxAnimation);
     }
-    
+
     // Slower, smoother parallax movement every 8 seconds
     parallaxAnimation = setInterval(() => {
         const { x, y } = getSubtleParallaxPosition();
